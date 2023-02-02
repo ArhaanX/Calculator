@@ -1,0 +1,111 @@
+package com.example.calcx;
+
+import android.annotation.SuppressLint;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
+import android.widget.TextView;
+import androidx.appcompat.app.AppCompatActivity;
+import org.mozilla.javascript.Context;
+import org.mozilla.javascript.Scriptable;
+
+
+public class MainActivity extends AppCompatActivity implements View.OnClickListener{
+
+    TextView data, output;
+    Button clear, bracketL, bracketR;
+    Button division, multiplication, subtraction, addition, equal;
+    Button number0, number1, number2, number3, number4, number5, number6, number7, number8, number9;
+    Button AC, decimal;
+
+
+
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        data = findViewById(R.id.data);
+        output = findViewById(R.id.output);
+
+        assignId(clear, R.id.clear);
+        assignId(bracketL, R.id.bracketL);
+        assignId(bracketR, R.id.bracketR);
+        assignId(division, R.id.division);
+        assignId(multiplication, R.id.multiplication);
+        assignId(subtraction, R.id.subtraction);
+        assignId(addition, R.id.addition);
+        assignId(number0, R.id.number0);
+        assignId(number1, R.id.number1);
+        assignId(number2, R.id.number2);
+        assignId(number3, R.id.number3);
+        assignId(number4, R.id.number4);
+        assignId(number5, R.id.number5);
+        assignId(number6, R.id.number6);
+        assignId(number7, R.id.number7);
+        assignId(number8, R.id.number8);
+        assignId(number9, R.id.number9);
+        assignId(equal, R.id.equal);
+        assignId(AC, R.id.AC);
+        assignId(decimal, R.id.decimal);
+
+
+
+    }
+    void assignId(Button btn, int id){
+        btn = findViewById(id);
+        btn.setOnClickListener(this);
+
+    }
+
+
+    @SuppressLint("SetTextI18n")
+    @Override
+    public void onClick(View view) {
+        Button button =(Button) view;
+        String buttonText = button.getText().toString();
+        String dataToCalculate = data.getText().toString();
+
+        if (buttonText.equals("C")){
+            output.setText("0");
+            data.setText(" ");
+            return;
+        }
+        if (buttonText.equals("=")){
+            output.setText("=" + output.getText());
+            return;
+
+        }
+        if (button == findViewById(R.id.clear) ){
+            dataToCalculate = dataToCalculate.substring(0, dataToCalculate.length()-1);
+        }
+        else {
+            dataToCalculate = dataToCalculate + buttonText ;
+        }
+
+        data.setText(dataToCalculate);
+        String finalResult = getResult(dataToCalculate);
+
+        if (!finalResult.equals("Err")){
+            output.setText(finalResult);
+        }
+
+
+    }
+    String getResult(String data){
+        try{
+            Context context = Context.enter();
+            context.setOptimizationLevel(-1);
+            Scriptable scriptable = context.initStandardObjects();
+            String finalResult = context.evaluateString(scriptable, data, "Javascript", 1, null).toString();
+            if (finalResult.endsWith(".0")){
+                finalResult = finalResult.replace(".0", "");
+            }
+            return finalResult;
+        }
+        catch (Exception e){
+            return "Err";
+        }
+
+    }
+}
